@@ -8,5 +8,5 @@ boolean isEmpty();
 boolean isLeaf();
 int getHeight();
 void Traversal();
-	
+void CheeseBurger();
 }
