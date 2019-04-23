@@ -61,7 +61,7 @@ public class MainController {
     }
     
     
-    public void play(MouseEvent event) {
+    public void play(MouseEvent event) throws Exception {
     	String media = music.getMusic();
     	try {
 			music.playMusic(media);
