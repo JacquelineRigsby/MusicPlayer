@@ -1,6 +1,7 @@
 package util;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.nio.file.Paths;
 
 import javax.sound.sampled.AudioInputStream;
@@ -78,26 +79,36 @@ public class MusicPlayer <T> {
 
 	}
 	
-	public String getMusic() {
+	public String getMusic() throws Exception {
 		XMLInputFactory factory = XMLInputFactory.newInstance();
 		FileInputStream is = new FileInputStream(new File("lib/library.xml"));
 		XMLStreamReader reader = factory.createXMLStreamReader(is, "UTF-8");
 		
 		String element; 
-		
+		boolean found = false;
+		String path = "";
 		 try {
-			while(reader.hasNext()) {
+			while(reader.hasNext() && !found) {
 			     reader.next();
 			     if (reader.isWhiteSpace()) {
 			         continue;
 			     } else if (reader.isStartElement()) {
 			         element = reader.getName().getLocalPart();
+			         if(element.equals("location")) {
+			        	path = element;
+			         }
+			      
+			     } else if(reader.isCharacters() && path.equals("location")) {
+			    	 path=reader.getText();
+			     } else if(reader.isEndElement() && reader.getName().getLocalPart().equals("songs")) {
+			    	 reader.close();
+			    	 break;
 			     }
 			 }
 		} catch (XMLStreamException e) {
 			
 		}
-		return element;
+		return path;
 	}
 	
 	public Media loadMusic(String MusicLocation) {
