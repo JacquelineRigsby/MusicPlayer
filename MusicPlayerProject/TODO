@@ -1,0 +1,23 @@
+1) Make Scenes for each thing (albums, artists, playlists, etc
+2) Add functionality to each button
+
+
+-Make album subscene work
+-Make Playlist Scene
+-Make Song Scene
+-Figure out how scrollview works
+-Make play button play at paused time
+-Make Pause button work
+-Make loop button work
+-Make shuffle button work (priority queue)
+-Make Skip button work (priority queue)
+
+-Make queue a menu (either in main scene or new scene)
+-Add search functionality
+-Design search scene
+-Add sorting functionality
+-Create CSS style for each item
+-Get time slider working
+
+
+
