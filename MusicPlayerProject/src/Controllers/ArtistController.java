@@ -49,8 +49,9 @@ public class ArtistController {
                  */
                 try {
 					MainController main = new MainController();
-					System.out.println("test");
-					main.setView("ArtistSub");
+					System.out.println("Artist Click");
+					//main.setView("ArtistSub");
+					main.setSubView();
 					
 					
 					

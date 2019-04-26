@@ -21,65 +21,31 @@ public class MusicPlayer <T> {
 	
 	private MediaPlayer mediaPlayer;
 	private Media song;
+	private FileSystem file = new FileSystem();
+	boolean playing = false;
 
 	
 	static Clip clip;
 	static long length;
 	
-	static void playMusic1(String musicLocation) {
-		
-		try {
-			File musicPath = new File(musicLocation);
-			
-			if(musicPath.exists()) {
-				AudioInputStream audioInput = AudioSystem.getAudioInputStream(musicPath);
-				Clip clip = AudioSystem.getClip();
-				clip.open(audioInput);
-				System.out.println(clip.getMicrosecondLength());
-				Thread.sleep(5000);
-				clip.start();
-				//System.out.println(clip.getMicrosecondLength());
-				clip.loop(Clip.LOOP_CONTINUOUSLY);
-				
-				JOptionPane.showMessageDialog(null, "Hit ok to pause");
-				long clipTimePosition = clip.getMicrosecondPosition();
-				clip.stop();
-				
-				JOptionPane.showMessageDialog(null, "Hit ok to go");
-				clip.setMicrosecondPosition(clipTimePosition);
-				clip.start();
-				
-				
-				//JOptionPane.showMessageDialog(null, "Press Stop to stop playing");
-			}
-			else {
-				System.out.println("Can't find file");
-			}
-		}
-		catch(Exception ex) {
-			ex.printStackTrace();
-		}
-	}
-	
-	public Clip oldloadMusic(String MusicLocation) throws Exception {
-		File music = new File(MusicLocation);
-		AudioInputStream audioInput = AudioSystem.getAudioInputStream(music);
-		clip = AudioSystem.getClip();
-		clip.open(audioInput);
-		return clip;
-	}
-
-	public void playMusic(String musicLocation) throws Exception {
+	public void playMusic(String musicLocation){
 		Media media = loadMusic(musicLocation);
-		mediaPlayer = new MediaPlayer(media);
 		if(!isPlaying()) {
+			song = media;
+			mediaPlayer = new MediaPlayer(song);
 			mediaPlayer.play();
+			playing = true;
+
+		}
+		if(mediaPlayer.getCurrentTime()==media.getDuration()) {
+			System.out.println("test");
+			playing = false;
 		}
 		
 
 	}
 	
-	public String getMusic() throws Exception {
+	public String getMusic(String song) throws Exception {
 		XMLInputFactory factory = XMLInputFactory.newInstance();
 		FileInputStream is = new FileInputStream(new File("lib/library.xml"));
 		XMLStreamReader reader = factory.createXMLStreamReader(is, "UTF-8");
@@ -96,11 +62,21 @@ public class MusicPlayer <T> {
 			         element = reader.getName().getLocalPart();
 			         if(element.equals("location")) {
 			        	path = element;
+
+			         }
+			         if(element.equals("title")) {
+			        	 path = element;
 			         }
 			      
 			     } else if(reader.isCharacters() && path.equals("location")) {
-			    	 path=reader.getText();
-			     } else if(reader.isEndElement() && reader.getName().getLocalPart().equals("songs")) {
+			    	 if(reader.getText().toLowerCase().contains(song.toLowerCase())) {
+			    		 path=reader.getText();
+			    		 found = true;
+			    	 }
+			    	 
+			    	 
+			    	 
+			     }else if(reader.isEndElement() && reader.getName().getLocalPart().equals("songs")) {
 			    	 reader.close();
 			    	 break;
 			     }
@@ -117,11 +93,12 @@ public class MusicPlayer <T> {
 	}
 	
 	public boolean isPlaying() {
-		return mediaPlayer != null && MediaPlayer.Status.PLAYING.equals(mediaPlayer.getStatus());
+		return mediaPlayer != null && playing;
 	}
 	
 	public void pauseMusic() {
 		mediaPlayer.pause();
+		playing = false;
 	}
 	
 	

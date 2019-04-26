@@ -26,7 +26,7 @@ public class Main extends Application{
 	private Node mainLayout;
 	private MainController mainController;
 	private Scene scene;
-	private Song nowPlaying;
+	private static Song nowPlaying;
 	private int nowPlayingIndex;
 	private FileSystem file = new FileSystem();
 	private ArrayList<Song> getSongList;
@@ -115,6 +115,10 @@ public class Main extends Application{
 	
 	public Stage getStage() {
 		return mainStage;
+	}
+	
+	public Song getNowPlaying() {
+		return nowPlaying;
 	}
 
 	

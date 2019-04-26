@@ -13,8 +13,8 @@
 -Make Skip button work (priority queue)
 
 -Make queue a menu (either in main scene or new scene)
--Add search functionality
--Design search scene
+
+-Get search to work
 -Add sorting functionality
 -Create CSS style for each item
 -Get time slider working
