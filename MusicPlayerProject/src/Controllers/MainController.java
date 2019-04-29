@@ -45,7 +45,7 @@ public class MainController implements Initializable{
 	 @FXML private ImageView nowPlayingImage;
 	 @FXML private Label nowPlayingSong = new Label();
 	 @FXML private Label nowPlayingArtist = new Label();
-	 @FXML private Button homeButton;
+	 @FXML private Button homeButton = new Button();
      @FXML private HBox mediaControls; 
      @FXML private SVGPath shuffleButton;  
      @FXML private SVGPath repeatButton;  
@@ -63,13 +63,13 @@ public class MainController implements Initializable{
      @FXML private ListView<String> queueList;
      @FXML private Pane searchResultView = new Pane();
 
-     private Main main = new Main();
-     private FileSystem file = new FileSystem();
-     private Node currentScene;
-     private boolean showing;
-     private String test;
-     private ArtistSubController artist = new ArtistSubController();
-     private String searchResult;
+     private static Main main = new Main();
+     private static FileSystem file = new FileSystem();
+     private static Node currentScene;
+     private static boolean showing;
+     private static String test;
+     private static ArtistSubController artist = new ArtistSubController();
+     private static String searchResult;
 
 
      public void initialize(URL location, ResourceBundle resources) {
@@ -165,6 +165,10 @@ public class MainController implements Initializable{
     	main.pauseMusic();
     }
     
+    public void loop(MouseEvent event) {
+    	main.repeat(event);
+    }
+    
     public void setSubView() {
     	try {
     		subView.setVisible(true);
@@ -251,8 +255,10 @@ public class MainController implements Initializable{
       		  FXMLLoader loader = new FXMLLoader(getClass().getResource(fileName));
       		  currentScene = loader.load();
       		  //currentScene.toFront();
-      		  System.out.println(currentScene);  		  
-      		  //homeButton.setVisible(true);
+      		  //System.out.println(currentScene);  
+      		  if(!homeButton.isVisible()) {
+      			 homeButton.setVisible(true);
+      		  }
       		  subView.getChildren().setAll(currentScene);
       		  
   		} catch (IOException e) {
@@ -261,6 +267,8 @@ public class MainController implements Initializable{
   		}
     	});  
     }
+    
+    
     @FXML
     void goHome(MouseEvent event) {
     		Platform.runLater(() -> {

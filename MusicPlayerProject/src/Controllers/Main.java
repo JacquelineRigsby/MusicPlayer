@@ -18,6 +18,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -166,6 +167,7 @@ public class Main extends Application{
 					mediaPlayer.setStartTime(duration);
 				}
 				mediaPlayer.play();
+				
 				setNowPlaying(currentsong);
 				currentsong.setPlaying(true);
 				playing = true;
@@ -243,6 +245,18 @@ public class Main extends Application{
             
         }
     }
+	
+	public void repeat(MouseEvent event) {
+		if(event.getClickCount() == 1) {
+			mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+			System.out.println("we did it reddit");
+		}
+		else if(event.getClickCount() == 2) {
+			mediaPlayer.setCycleCount(0);
+			System.out.println("ZERO TO HERO");
+		}
+		
+	}
 
 	
 	

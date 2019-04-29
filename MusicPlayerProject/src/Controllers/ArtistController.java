@@ -62,9 +62,9 @@ public class ArtistController implements Initializable{
                 	MainController main = new MainController();
 					System.out.println("Artist Click");
 					
-		    		 Node scene = FXMLLoader.load(getClass().getResource("ArtistSub.fxml"));
-		    		 main.setView("ArtistSub");
-		    		 System.out.println("test2");
+		    		Node scene = FXMLLoader.load(getClass().getResource("ArtistSub.fxml"));
+		    		main.setView("ArtistSub");
+		    		 
 		    		 
 		    		 
 					//main.setSubView();
