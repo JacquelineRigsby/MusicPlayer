@@ -1,43 +1,40 @@
 package Controllers;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import util.Album;
-import util.Artist;
 import util.FileSystem;
+
 import util.Song;
 
-public class ArtistSubController implements Initializable {
+public class AlbumController implements Initializable{
+
+    @FXML
+    private ListView<String> albumList;
 
     @FXML
     private Label artistName;
 
     @FXML
-    private TableView<Song> songTable = new TableView<Song>();
+    private TableView<Song> songTable;
 
     @FXML
     private TableColumn<Song, String> songColumn;
 
     @FXML
     private TableColumn<Song, Integer> lengthColumn;
-
-    @FXML
-    private ListView<String> albumList;
     
-    private Artist artist;
+    private Album album;
     private Album selectedAlbum;
     
     FileSystem file = new FileSystem();
@@ -45,15 +42,10 @@ public class ArtistSubController implements Initializable {
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-
-		//ArrayList<Song> getSongList = file.loadPlayingList();
-		artist = file.getArtists().get(0);
-		artistName.setText(artist.getTitle());
 		ObservableList<Album> albums = FXCollections.observableArrayList();
 		ObservableList<String> albumTitle = FXCollections.observableArrayList();
-		//if you cant get subscene working. change to file.getAlbums();
-		
-		for(Album album: artist.getAlbums()) {
+		artistName.setVisible(false);
+		for(Album album: file.getAlbums()) {
 			albums.add(album);
 			albumTitle.add(album.getTitle());
 		}
@@ -65,13 +57,17 @@ public class ArtistSubController implements Initializable {
     	albumList.setOnMouseClicked(event -> {
 
             if (event.getClickCount() == 2) {
-            	for(int i=0; i<albumTitle.size(); i++) {
-               		if(albumList.getSelectionModel().getSelectedItem().equals(albums.get(i).getTitle())) {
-               			selectedAlbum=albums.get(i);
-               		}
-               	}
+           	for(int i=0; i<albumTitle.size(); i++) {
+           		if(albumList.getSelectionModel().getSelectedItem().equals(albums.get(i).getTitle())) {
+           			selectedAlbum=albums.get(i);
+           		}
+           	}
+            	
+
                try {
             	   showSongs(selectedAlbum);
+            	   artistName.setText(selectedAlbum.getTitle());
+            	   artistName.setVisible(true);
 
 					
 					
@@ -94,17 +90,12 @@ public class ArtistSubController implements Initializable {
 		
 		
 	}
-	
-	public void setSong(Artist artist) {
-		this.artist = artist;
-	}
-	
 	public void showSongs(Album album) {
 		ObservableList<Song> songs = FXCollections.observableArrayList();
         songs.addAll(album.getSongs());
         songTable.setItems(songs);
 	}
-    
-    
+	
+	
 
 }

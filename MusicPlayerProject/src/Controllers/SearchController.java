@@ -32,9 +32,10 @@ public class SearchController implements Initializable{
     private TableColumn<Song, String> albumColumn;
 
     @FXML
-    private TableColumn<Song, Long> lengthColumn;
+    private TableColumn<Song, Integer> lengthColumn;
     
     private Song song;
+    private String searchResult;
     
     FileSystem file = new FileSystem();
     MainController main = new MainController();
@@ -44,7 +45,10 @@ public class SearchController implements Initializable{
 		songColumn.setCellValueFactory(new PropertyValueFactory<Song,String>("location"));
 		artistColumn.setCellValueFactory(new PropertyValueFactory<Song,String>("artist"));
 		albumColumn.setCellValueFactory(new PropertyValueFactory<Song,String>("artist"));
-		lengthColumn.setCellValueFactory(new PropertyValueFactory<Song,Long>("length"));
+		lengthColumn.setCellValueFactory(new PropertyValueFactory<Song,Integer>("length"));
+		
+		
+		System.out.println(searchResult);
 		
 	}
 	
@@ -58,9 +62,12 @@ public class SearchController implements Initializable{
 			}
 		}
 		searchTable.setItems(songs);
-		main.setView("Search");
 		
 		
+	}
+	
+	public void setSearchResult(String searchResult) {
+		this.searchResult=searchResult;
 	}
     
     

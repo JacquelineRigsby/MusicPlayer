@@ -257,6 +257,12 @@ public class FileSystem {
         }
         return songs.stream().filter(song -> title.equals(song.getTitle())).findFirst().get();
     }
+	public Song getSongLocation(String location) {
+		if (songs == null) {
+			getSongs();
+		}
+		return songs.stream().filter(song -> location.equals(song.getLocation())).findFirst().get();
+	}
 	public File getDirectory () {
 		return directory;
 	}

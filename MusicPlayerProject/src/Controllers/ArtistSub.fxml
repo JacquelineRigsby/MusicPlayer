@@ -2,7 +2,6 @@
 
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.BorderPane?>
@@ -16,19 +15,15 @@
          </font>
       </Label>
    </top>
-   <right>
-      <ScrollPane prefHeight="353.0" prefWidth="312.0" BorderPane.alignment="CENTER">
-         <content>
-            <TableView fx:id="songTable" prefHeight="352.0" prefWidth="309.0">
-              <columns>
-                <TableColumn fx:id="songColumn" prefWidth="161.0" text="Song" />
-                <TableColumn fx:id="lengthColumn" prefWidth="136.0" text="Duration" />
-              </columns>
-            </TableView>
-         </content>
-      </ScrollPane>
-   </right>
    <left>
       <ListView fx:id="albumList" prefHeight="353.0" prefWidth="290.0" BorderPane.alignment="CENTER" />
    </left>
+   <right>
+      <TableView fx:id="songTable" prefHeight="352.0" prefWidth="309.0" BorderPane.alignment="CENTER">
+        <columns>
+          <TableColumn fx:id="songColumn" prefWidth="161.0" text="Song" />
+          <TableColumn fx:id="lengthColumn" prefWidth="136.0" text="Duration" />
+        </columns>
+      </TableView>
+   </right>
 </BorderPane>

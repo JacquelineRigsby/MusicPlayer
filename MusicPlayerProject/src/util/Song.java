@@ -146,4 +146,7 @@ public final class Song {
     public void setSelected(boolean selected) {
         this.selected.set(selected);
     }
+    public void setLocation(String location) {
+    	this.location=location;
+    }
 }

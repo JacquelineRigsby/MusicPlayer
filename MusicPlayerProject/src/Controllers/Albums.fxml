@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="283.0" prefWidth="585.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.AlbumController">
+   <left>
+      <ListView fx:id="albumList" prefHeight="353.0" prefWidth="290.0" BorderPane.alignment="CENTER" />
+   </left>
+   <right>
+      <VBox prefHeight="283.0" prefWidth="296.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="artistName" alignment="CENTER" prefHeight="34.0" prefWidth="296.0" text="Album">
+               <font>
+                  <Font name="System Bold" size="23.0" />
+               </font>
+            </Label>
+            <TableView fx:id="songTable" prefHeight="352.0" prefWidth="309.0">
+              <columns>
+                <TableColumn fx:id="songColumn" prefWidth="176.0" text="Song" />
+                <TableColumn fx:id="lengthColumn" prefWidth="121.0" text="Duration" />
+              </columns>
+            </TableView>
+         </children>
+      </VBox>
+   </right>
+</BorderPane>

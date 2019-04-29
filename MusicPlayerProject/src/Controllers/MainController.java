@@ -9,8 +9,11 @@ import javax.sound.sampled.Clip;
 import javax.swing.JOptionPane;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -40,7 +43,8 @@ import util.*;
 
 public class MainController implements Initializable{
 	 @FXML private ImageView nowPlayingImage;
-	 @FXML private Label nowPlayingSong;
+	 @FXML private Label nowPlayingSong = new Label();
+	 @FXML private Label nowPlayingArtist = new Label();
 	 @FXML private Button homeButton;
      @FXML private HBox mediaControls; 
      @FXML private SVGPath shuffleButton;  
@@ -49,7 +53,7 @@ public class MainController implements Initializable{
      @FXML private SVGPath pauseButton;   
      @FXML private SVGPath skipForward;  
      @FXML private Button queueButton;  
-     @FXML private Slider timeSlider; 
+     @FXML private Slider timeSlider = new Slider(); 
      @FXML private VBox playlists; 
      @FXML private VBox artists;
      @FXML private VBox albums; 
@@ -60,45 +64,96 @@ public class MainController implements Initializable{
      @FXML private Pane searchResultView = new Pane();
 
      private Main main = new Main();
-     private MusicPlayer music = new MusicPlayer();
      private FileSystem file = new FileSystem();
      private Node currentScene;
      private boolean showing;
+     private String test;
+     private ArtistSubController artist = new ArtistSubController();
+     private String searchResult;
 
 
      public void initialize(URL location, ResourceBundle resources) {
+    	 
     	 queueList.setVisible(false);
     	 searchResultView.setVisible(false);
-    	 homeButton = new Button();
-    	 homeButton.setOpacity(0);
+    	 homeButton.setVisible(false);
+    	 
+    	 timeSlider.setFocusTraversable(false);
+     	
+
+         timeSlider.valueProperty().addListener(
+             (slider, oldValue, newValue) -> {
+                 double current = newValue.doubleValue();
+                 if (!timeSlider.isValueChanging()) {
+
+                     int seconds = (int) Math.round(current / 4.0);
+                     timeSlider.setValue(seconds * 4);
+                     main.seek(seconds);
+                 }
+             }
+         );
+         
+         fillQueue();
+         //nowPlayingSong.setText(main.getNowPlaying().getTitle());
+         
+         
+         
+         
+         initializeTimeSlider();
 
 
      }
      
-     public void playListsScene(MouseEvent event) {
-    	System.out.println("Test Text");
+     public void initializeTimeSlider() {
 
-    	try {
-    		
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+         Song song = main.getNowPlaying();
+         if (song != null) {
+             timeSlider.setMin(0);
+             timeSlider.setMax(song.getLengthInSeconds() * 4);
+             timeSlider.setValue(0);
+             timeSlider.setBlockIncrement(1);
+         } else {
+             timeSlider.setMin(0);
+             timeSlider.setMax(1);
+             timeSlider.setValue(0);
+             timeSlider.setBlockIncrement(1);
+         }
+     }
+     
+     public void updateTimeSlider() {
+         timeSlider.increment();
+     }
+     
+     
+     public void playListsScene(MouseEvent event) {
+    	setView("ArtistSub");
 
     }
     
     public void artistsScene(MouseEvent event) throws Exception {
     	setView("Artists");
-    	//setSubView();
-    	//setSearchView();
     	
+    }
+    
+    public void albumScene(MouseEvent event) {
+    	setView("Albums");
+    }
+    
+    public void songsScene(MouseEvent event) {
+    	setView("Songs");
     }
     
     
     public void play(MouseEvent event) throws Exception {
     	String song = main.getNowPlaying().getTitle();
-    	String media = music.getMusic(song);
+    	String artist = main.getNowPlaying().getArtist();
+
+    	String media = main.getMusic(song);
     	try {
-			music.playMusic(media);
+    		
+			main.playMusic(media);
+			setNowPlaying(song, artist);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -106,14 +161,13 @@ public class MainController implements Initializable{
     }
     
     public void pause(MouseEvent event) {
-    	if(music.isPlaying()) {
-    		music.pauseMusic();
-    	}
+    	pauseButton.requestFocus();
+    	main.pauseMusic();
     }
     
     public void setSubView() {
     	try {
-    		subView.setVisible(false);
+    		subView.setVisible(true);
     		BorderPane pane = new BorderPane();
 			pane = FXMLLoader.load(getClass().getResource("ArtistSub.fxml"));
 			subView.getChildren().setAll(pane);
@@ -142,10 +196,32 @@ public class MainController implements Initializable{
     }
     @FXML
     void queueClick(MouseEvent event) {
+    	queueButton.addEventFilter(MouseEvent.ANY, new EventHandler<MouseEvent>() {
+
+            long startTime;
+
+            @Override
+            public void handle(MouseEvent event) {
+           	
+                if (event.getEventType().equals(MouseEvent.MOUSE_PRESSED)) {
+                    startTime = System.currentTimeMillis();
+                } else if (event.getEventType().equals(MouseEvent.MOUSE_RELEASED) && showing) {
+                    if (System.currentTimeMillis() - startTime > 2 * 1000) {
+                    	System.out.println("Pressed for at least 2 seconds (" + (System.currentTimeMillis() - startTime) + " milliseconds)");
+                        queueList.getItems().removeAll();
+                        showing = false;
+                    } else
+                        System.out.println("Pressed for " + (System.currentTimeMillis() - startTime) + " milliseconds");
+                }
+            }
+        });
+    	
     	if(!showing) {
+    		queueList.requestFocus();
     		queueList.setVisible(true);
     		showing = true;
     	}
+
     	else {
     		queueList.setVisible(false);
     		showing = false;
@@ -153,41 +229,54 @@ public class MainController implements Initializable{
 
     }
     
+    public void fillQueue() {
+    	//get songs right away
+    	//option to clear songs
+    	//if song is playing, add to queue
+    	//if double click on item in queue, move it to front of queue and play immediatly
+    	//if item in queue is held for more than 2-3 seconds, remove it
+    	
+    	ObservableList<String> queue= FXCollections.observableArrayList();
+    	for(Song song: file.getSongs()) {
+    		queue.add(song.getTitle());
+    	}
+    	queueList.setItems(queue);
+    }
+    
     public void setView(String viewName) {    	  
-    	  try {
-    		  if(currentScene == null) {
-    			  currentScene = FXMLLoader.load(getClass().getResource("Main.fxml"));
-    			  //subView.getChildren().remove(currentScene);
-    		  }
-    		  subView.getChildren().remove(currentScene);
-    		  String fileName = viewName.substring(0, 1).toUpperCase() + viewName.substring(1) + ".fxml";
-    		  Node scene = FXMLLoader.load(getClass().getResource(fileName));
-    		  scene.toFront();
-    		  System.out.println(scene);
-    		  homeButton.setOpacity(1);
-    		  subView.getChildren().setAll(scene);
-    		  
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    	Platform.runLater(() -> {
+    		try {
+       		 
+      		  String fileName = viewName.substring(0, 1).toUpperCase() + viewName.substring(1) + ".fxml";
+      		  FXMLLoader loader = new FXMLLoader(getClass().getResource(fileName));
+      		  currentScene = loader.load();
+      		  //currentScene.toFront();
+      		  System.out.println(currentScene);  		  
+      		  //homeButton.setVisible(true);
+      		  subView.getChildren().setAll(currentScene);
+      		  
+  		} catch (IOException e) {
+  			// TODO Auto-generated catch block
+  			e.printStackTrace();
+  		}
+    	});  
     }
     @FXML
     void goHome(MouseEvent event) {
-    	try {
-    		
-    		Stage stage = main.getStage();
-    		FXMLLoader loader = new FXMLLoader(getClass().getResource("Main.fxml"));
-    		Node mainLayout = loader.load();
-    		Scene scene = new Scene((Parent) mainLayout);
-    		mainLayout.setVisible(true);
-			stage.setScene(scene);
-			stage.show();
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    		Platform.runLater(() -> {
+				try {
+					Stage stage = main.getStage();
+	        		FXMLLoader loader = new FXMLLoader(getClass().getResource("Main.fxml"));
+	        		Node pane;
+					pane = loader.load();
+	        		Scene scene = new Scene((Parent) pane);
+	    			stage.setScene(scene);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+    		});
+
     }
     
     public void addToQueue() {
@@ -198,13 +287,18 @@ public class MainController implements Initializable{
     	 switch(event.getCode()){
     	 case ENTER:
     		 try {
-    			 if(music.getMusic(searchBar.getText())=="location") {
+    			 if(main.getMusic(searchBar.getText())=="location") {
     				 JOptionPane.showMessageDialog(null,"No songs found!");
     			 }
     			 else {
-    				 //music.playMusic(music.getMusic(searchBar.getText()));
+    				 searchResult=searchBar.getText();
     				 SearchController controller = new SearchController();
-        			 controller.searchBarText(searchBar.getText());
+    				 controller.setSearchResult(searchBar.getText());
+    				 System.out.println(searchResult);
+    				 setView("Search");
+    				 
+    				 //music.playMusic(music.getMusic(searchBar.getText()));
+        			 //controller.searchBarText(searchBar.getText());
     			 }
 
 			} catch (Exception e) {
@@ -214,6 +308,18 @@ public class MainController implements Initializable{
     		
     	}
     }
+    
+    public void setNowPlaying(String song, String artist) {
+    	nowPlayingSong.setText(song);
+    	nowPlayingArtist.setText(artist);
+    }
+    
+    public void setCurrentScene(Node scene) {
+    	this.currentScene=currentScene;
+    }
+    
+    
+
     
 
 }

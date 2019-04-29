@@ -157,7 +157,7 @@
                                  </children>
                               </VBox>
                               <Separator prefWidth="200.0" />
-                              <VBox fx:id="albums" prefHeight="139.0" prefWidth="201.0">
+                              <VBox fx:id="albums" onMouseClicked="#albumScene" prefHeight="139.0" prefWidth="201.0">
                                  <children>
                                     <Pane prefHeight="111.0" prefWidth="298.0">
                                        <children>
@@ -201,7 +201,7 @@
                                        </children>
                                     </VBox>
                                     <Separator prefWidth="200.0" />
-                                    <VBox fx:id="songs" prefHeight="200.0" prefWidth="100.0">
+                                    <VBox fx:id="songs" onMouseClicked="#songsScene" prefHeight="200.0" prefWidth="100.0">
                                        <children>
                                           <Pane prefHeight="134.0" prefWidth="240.0">
                                              <children>
