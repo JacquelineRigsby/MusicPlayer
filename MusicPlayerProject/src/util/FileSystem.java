@@ -354,6 +354,8 @@ public class FileSystem {
                 albums.add(new Album(entry.getKey(), artist, albumSongs));
             }
         }
+        for(int i=0; i<albums.size(); i++) {
+        }
     }
     public ObservableList<Artist> getArtists() {
         if (artists == null) {

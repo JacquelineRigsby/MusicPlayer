@@ -39,7 +39,7 @@ public final class Artist{
     public Artist(String title, ArrayList<Album> albums) {
         this.title = title;
         this.albums = albums;
-        this.artistImageProperty = new SimpleObjectProperty<>(getArtistImage());
+       
     }
 
     /**
@@ -66,68 +66,6 @@ public final class Artist{
      * Gets images for artists
      * @return artist image
      */
-    public Image getArtistImage() {
-        if (artistImage == null) {
-            try {
-                File file = new File("img/" + this.title + ".jpg");
-                artistImage = new Image(file.toURI().toURL().toString());
-                if (artistImage.isError()) {
-                    file.delete();
-                    artistImage = new Image("img/artistsIcon.png");
-                }
-            } catch (Exception ex) {
-                File file = new File("img/" + this.title + ".jpg");
-                file.delete();
-               
-            }
-        }
-
-        return artistImage;
-    }
-
-    public void downloadArtistImage() {
-        try {
-            File file = new File("img/" + this.title + ".jpg");
-            file.mkdirs();
-            XMLInputFactory factory = XMLInputFactory.newInstance();
-            URL xmlData = new URL(APIBASE
-                    + "method=artist.getinfo"
-                    + "&artist=" + URLEncoder.encode(this.title, "UTF-8")
-                    + "&api_key=" + APIKEY);
-            XMLStreamReader reader = factory.createXMLStreamReader(xmlData.openStream(), "UTF-8");
-            boolean imageFound = false;
-
-            while (reader.hasNext() && !imageFound) {
-                reader.next();
-
-                if (reader.isStartElement()
-                        && reader.getName().getLocalPart().equals("image")
-                        && reader.getAttributeValue(0).equals("extralarge")) {
-
-                    reader.next();
-
-                    if (reader.hasText()) {
-                        BufferedImage bufferedImage = ImageIO.read(new URL(reader.getText()));
-                        BufferedImage newBufferedImage = new BufferedImage(bufferedImage.getWidth(),
-                                bufferedImage.getHeight(), BufferedImage.TYPE_INT_RGB);
-                        newBufferedImage.createGraphics().drawImage(bufferedImage, 0, 0, Color.WHITE, null);
-                        ImageIO.write(newBufferedImage, "jpg", file);
-                        imageFound = true;
-                    }
-                }
-            }
-
-            artistImage = new Image(file.toURI().toURL().toString());
-            if (artistImage.isError()) {
-                file.delete();
-                artistImage = new Image("img/artistsIcon.png");
-            }
-            this.artistImageProperty.setValue(artistImage);
-
-        } catch (Exception ex) {
-            File file = new File("img/" + this.title + ".jpg");
-            file.delete();
-        }
-    }
+   
 
 }
