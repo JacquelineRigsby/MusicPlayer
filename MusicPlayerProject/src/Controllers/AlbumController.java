@@ -1,6 +1,7 @@
 package Controllers;
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
@@ -49,6 +50,8 @@ public class AlbumController implements Initializable{
 			albums.add(album);
 			albumTitle.add(album.getTitle());
 		}
+		//file.sortSongs(albumTitle);
+		Collections.sort(albumTitle);
 		albumList.setItems(albumTitle);
 		
 		songColumn.setCellValueFactory(new PropertyValueFactory<>("title"));

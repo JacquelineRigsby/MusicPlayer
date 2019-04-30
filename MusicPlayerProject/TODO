@@ -3,19 +3,13 @@
 -Make shuffle button work (priority queue)
 -Make Skip button work (priority queue)
 
--Make queue a menu (either in main scene or new scene)
-
--Make search scene and song scene have data populate
 -Add sorting functionality
--Create CSS style for each item
--Get time slider working
+
 
 
 BUGS/THINGS TO FIX:
 
-BIG ONE: HAVE OTHER THINGS THAT ARE CALLED FROM OTHER CLASSES WORK PROPERALLY
-this includes showing other scenes, the play/pause button, etc. 
 
 FOCUS BEFOR PRES:
 Figure out how to add nodes into queue class
-Figure out how to populate data in Song/Search class
+

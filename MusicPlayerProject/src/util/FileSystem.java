@@ -49,7 +49,8 @@ import javafx.collections.ObservableList;
 
 public class FileSystem {
 	
-	private File directory;
+	private static String path;
+	private static File directory;
 	private static final String ID = "id";
 	private static final String TITLE = "title";
     private static final String ARTIST = "artist";
@@ -61,29 +62,71 @@ public class FileSystem {
     private static ArrayList<Song> songs;
     private static ArrayList<Artist> artists;
     private static ArrayList<Album> albums;
-    private static ArrayList<Playlist> playlists;
 	
 
 	public String getDefaultDirectory() throws Exception {
-		JFileChooser chooser = new JFileChooser();
-		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        int returnVal = chooser.showOpenDialog(null);
-        if(returnVal == JFileChooser.CANCEL_OPTION) {
-        	JOptionPane.showMessageDialog(null, "You must set a default directory to continue.");
-        	System.exit(0);
-        }
-        directory = chooser.getSelectedFile();
-   
-        return chooser.getSelectedFile().getPath();
+		String result = null;
+		if(path != null) {
+			result = path;
+		}
+		else {
+			JFileChooser chooser = new JFileChooser();
+			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+	        int returnVal = chooser.showOpenDialog(null);
+	        if(returnVal == JFileChooser.CANCEL_OPTION) {
+	        	JOptionPane.showMessageDialog(null, "You must set a default directory to continue.");
+	        	System.exit(0);
+	        }
+	        directory = chooser.getSelectedFile();
+	        result = chooser.getSelectedFile().getPath();
+	        path = result;
+		}
+
+        return result;
         //System.out.println(chooser.getSelectedFile().getName());
 	}
 	public static boolean isDefaultDirectory() throws Exception {
         File file = new File("lib/library.xml");
-		return file.exists();	
+        boolean found = false;
+        if(file.exists()) {
+        	XMLInputFactory factory = XMLInputFactory.newInstance();
+    		FileInputStream is = new FileInputStream(new File("lib/library.xml"));
+    		XMLStreamReader reader = factory.createXMLStreamReader(is, "UTF-8");
+    		
+    		String element; 
+
+    		String temppath = "";
+    		 try {
+    			while(reader.hasNext() && !found) {
+    			     reader.next();
+    			     if (reader.isWhiteSpace()) {
+    			         continue;
+    			     } else if (reader.isStartElement()) {
+    			         element = reader.getName().getLocalPart();
+    			         
+    			         if(element.equals("path")) {
+    			        	temppath = element;
+
+    			         }
+    			     } else if(reader.isCharacters() && temppath.equals("path")) {
+    			    	 
+    			    		 path=reader.getText();
+    			    		 
+    			    		 found = true;
+    			     }
+    			     
+    			 }
+    		} catch (XMLStreamException e) {
+    			
+    		}
+        }
+        
+		return found;	
 	}
 	public int getLibrary(File path, Document doc, Element songs, int i) {
 
-		File[] files = directory.listFiles();
+
+		File[] files = path.listFiles();
 		
 		 for (File file : files) {
 			 if (file.isFile()) {
@@ -140,13 +183,12 @@ public class FileSystem {
         Element songs = doc.createElement("songs");
         Element playlists = doc.createElement("playlists");
         Element nowPlayingList = doc.createElement("nowPlayingList");
-        Element lastSong = doc.createElement("lastPlayed");
 		
         doc.appendChild(library);
         library.appendChild(songs);
         library.appendChild(playlists);
         library.appendChild(nowPlayingList);
-        library.appendChild(lastSong);
+
         
         Element musicLibraryFileNum = doc.createElement("fileNum");
         Element lastIdAssigned = doc.createElement("lastId");
@@ -347,141 +389,6 @@ public class FileSystem {
             artists.add(new Artist(entry.getKey(), albums));
         }
     }
-    public static void addPlaylist(String text) {
-
-        Thread thread = new Thread(() -> {
-
-            int i = playlists.size() - 2;
-            playlists.add(new Playlist(i, text, new ArrayList<>()));
-
-            try {
-                DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-                Document doc = docBuilder.parse("lib/library.xml");
-
-                XPathFactory xPathfactory = XPathFactory.newInstance();
-                XPath xpath = xPathfactory.newXPath();
-
-                XPathExpression expr = xpath.compile("/library/playlists");
-                Node playlists = ((NodeList) expr.evaluate(doc, XPathConstants.NODESET)).item(0);
-
-                Element playlist = doc.createElement("playlist");
-                playlist.setAttribute("id", Integer.toString(i));
-                playlist.setAttribute(TITLE, text);
-                playlists.appendChild(playlist);
-
-                TransformerFactory transformerFactory = TransformerFactory.newInstance();
-                Transformer transformer = transformerFactory.newTransformer();
-                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-                DOMSource source = new DOMSource(doc);
-                File xmlFile = new File("lib/library.xml");
-                StreamResult result = new StreamResult(xmlFile);
-                transformer.transform(source, result);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-
-        });
-
-        thread.start();
-    }
-    public void removePlaylist(Playlist playlist) {
-        playlists.remove(playlist);
-    }
-    public ObservableList<Playlist> getPlaylists() {
-        if (playlists == null) {
-
-            playlists = new ArrayList<>();
-            int id = 0;
-
-            try {
-                XMLInputFactory factory = XMLInputFactory.newInstance();
-                factory.setProperty("javax.xml.stream.isCoalescing", true);
-                FileInputStream is = new FileInputStream(new File("lib/library.xml"));
-                XMLStreamReader reader = factory.createXMLStreamReader(is, "UTF-8");
-
-                String element;
-                boolean isPlaylist = false;
-                String title = null;
-                ArrayList<Song> songs = new ArrayList<>();
-
-                while(reader.hasNext()) {
-                    reader.next();
-                    if (reader.isWhiteSpace()) {
-                        continue;
-                    } else if (reader.isStartElement()) {
-                        element = reader.getName().getLocalPart();
-
-                        // If the element is a play list, reads the element attributes to retrieve
-                        // the play list id and title.
-                        if (element.equals("playlist")) {
-                            isPlaylist = true;
-
-                            id = Integer.parseInt(reader.getAttributeValue(0));
-                            title = reader.getAttributeValue(1);
-                        }
-                    } else if (reader.isCharacters() && isPlaylist) {
-                        // Retrieves the reader value (song ID), gets the song and adds it to the songs list.
-                        String value = reader.getText();
-                        songs.add(getSong(Integer.parseInt(value)));
-                    } else if (reader.isEndElement() && reader.getName().getLocalPart().equals("playlist")) {
-                        // If the play list id, title, and songs have been retrieved, a new play list is created
-                        // and the values reset.
-                        playlists.add(new Playlist(id, title, songs));
-                        id = -1;
-                        title = null;
-                        songs = new ArrayList<>();
-                    } else if (reader.isEndElement() && reader.getName().getLocalPart().equals("playlists")) {
-                        reader.close();
-                        break;
-                    }
-                }
-                reader.close();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-
-            playlists.sort((x, y) -> {
-                if (x.getId() < y.getId()) {
-                    return 1;
-                } else if (x.getId() > y.getId()) {
-                    return -1;
-                } else {
-                    return 0;
-                }
-            });
-
-       
-        } else {
-            playlists.sort((x, y) -> {
-                if (x.getId() < y.getId()) {
-                    return 1;
-                } else if (x.getId() > y.getId()) {
-                    return -1;
-                } else {
-                    return 0;
-                }
-            });
-        }
-        return FXCollections.observableArrayList(playlists);
-    }
-    public Playlist getPlaylist(int id) {
-        if (playlists == null) {
-            getPlaylists();
-        }
-        // Gets the play list size.
-        int playListSize = getPlaylists().size();
-        // The +2 takes into account the two default play lists.
-        // The -1 is used because size() starts at 1 but indexes start at 0.
-        return playlists.get(playListSize - (id + 2) - 1);
-    }
-    public Playlist getPlaylist(String title) {
-        if (playlists == null) {
-            getPlaylists();
-        }
-        return playlists.stream().filter(playlist -> title.equals(playlist.getTitle())).findFirst().get();
-    }
     public ArrayList<Song> loadPlayingList() {
 
         ArrayList<Song> nowPlayingList = new ArrayList<>();
@@ -524,5 +431,30 @@ public class FileSystem {
 
         return nowPlayingList;
     }
+    
+    public static void sortSongs( ObservableList<String> albumTitle)
+    {
+          int j;
+          boolean flag = true;  // will determine when the sort is finished
+          String temp = null;
+
+
+          while ( flag )
+          {
+                flag = false;
+                for ( j = 0;  j < albumTitle.size() - 1;  j++ )
+                {
+                        if ( (albumTitle.get(j)).compareToIgnoreCase(albumTitle.get(j+1))>0)
+                        {                                             // ascending sort
+                                    temp=albumTitle.get(j);
+                                    albumTitle.get(j).equals(albumTitle.get(j+1));     // swapping
+                                    albumTitle.get(j+1).equals(temp); 
+                                    flag = true;
+                         }
+                        }
+                }
+          }
+
+
 }
 	

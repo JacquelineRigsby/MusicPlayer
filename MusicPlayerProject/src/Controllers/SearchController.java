@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -20,7 +21,7 @@ public class SearchController implements Initializable{
 	//display that array in a table
 	
 	@FXML
-	private TableView<Song> searchTable = new TableView<Song>();
+	private TableView<Song> searchTable;
 
     @FXML
     private TableColumn<Song, String> songColumn;
@@ -38,38 +39,40 @@ public class SearchController implements Initializable{
     private String searchResult;
     
     FileSystem file = new FileSystem();
-    MainController main = new MainController();
+    Main main = new Main();
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		songColumn.setCellValueFactory(new PropertyValueFactory<Song,String>("location"));
+		songColumn.setCellValueFactory(new PropertyValueFactory<Song,String>("title"));
 		artistColumn.setCellValueFactory(new PropertyValueFactory<Song,String>("artist"));
 		albumColumn.setCellValueFactory(new PropertyValueFactory<Song,String>("artist"));
 		lengthColumn.setCellValueFactory(new PropertyValueFactory<Song,Integer>("length"));
 		
-		
-		System.out.println(searchResult);
-		
-	}
-	
-	public void searchBarText(String search) {
-		ObservableList<Song> songs = file.getSongs();
-		for(int i=0; i<songs.size(); i++) {
-			if(songs.get(i).getLocation().toLowerCase().contains(search)) {
-				//System.out.println(songs.get(i).getLocation());
-				//System.out.println(songs.get(i));
-				searchTable.setItems(songs);
+
+		ObservableList<Song> songs = FXCollections.observableArrayList();
+		for(Song song: file.getSongs()) {
+			if(song.getLocation().toLowerCase().contains(MainController.searchResult.toLowerCase())) {
+				
+				songs.add(song);
 			}
 		}
+		
 		searchTable.setItems(songs);
+		
+		searchTable.setOnMouseClicked( event -> {
+ 		   if( event.getClickCount() == 2 ) {
+ 		      try {
+					main.playMusic(searchTable.getSelectionModel().getSelectedItem().getLocation());
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+ 		   }});
 		
 		
 	}
 	
-	public void setSearchResult(String searchResult) {
-		this.searchResult=searchResult;
-	}
-    
+
     
 
 }

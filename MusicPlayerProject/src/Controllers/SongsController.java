@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -18,7 +19,7 @@ import util.Song;
 public class SongsController implements Initializable{
 	
 		@FXML
-		private TableView<Song> songList = new TableView<Song>();
+		private TableView<Song> songsList;
 
 	 	@FXML
 	    private TableColumn<Song, String> songColumn;
@@ -39,6 +40,8 @@ public class SongsController implements Initializable{
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+
+		
 		songColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
 		artistColumn.setCellValueFactory(new PropertyValueFactory<>("artist"));
 		albumColumn.setCellValueFactory(new PropertyValueFactory<>("album"));
@@ -47,25 +50,14 @@ public class SongsController implements Initializable{
 		//songList = new 
 		//selectedSong = file.getSong("foward");
 		
-		Instant first = Instant.now();
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		Instant second = Instant.now();
 		
-		Duration duration = Duration.between(first, second);
-		ObservableList<Song> test = FXCollections.observableArrayList(
-				new Song(5, "wish", "diplo", "soundcloud",duration, "location"));
-		songList.setItems(test);
+		showSongs();
 		
-		songList.setOnMouseClicked( event -> {
+		songsList.setOnMouseClicked( event -> {
  		   if( event.getClickCount() == 2 ) {
  		      try {
-					//music.playMusic(music.getMusic(songList.getSelectionModel().getSelectedItem().getTitle()));
-					System.out.println(songList.getSelectionModel().getSelectedItem().getTitle());
+					main.playMusic(main.getMusic(songsList.getSelectionModel().getSelectedItem().getTitle()));
+					//System.out.println(songsList.getSelectionModel().getSelectedItem().getTitle());
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -74,28 +66,17 @@ public class SongsController implements Initializable{
 		
 		
 	}
-		//showSongs();
 		
 		
 	
 	
 	public void showSongs() {
-		//ObservableList<Song> songs = FXCollections.observableArrayList();
-		//songs.add(song);
-		
-		Instant first = Instant.now();
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		Instant second = Instant.now();
-		
-		Duration duration = Duration.between(first, second);
-		ObservableList<Song> test = FXCollections.observableArrayList(
-				new Song(5, "wish", "diplo", "soundcloud",duration, "location"));
-		songList.setItems(test);
+		Platform.runLater(() -> {
+			ObservableList<Song> songs = FXCollections.observableArrayList();
+			songs.addAll(file.getSongs());
+			songsList.setItems(songs);
+		});
+
 	}
 
 }

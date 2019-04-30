@@ -2,8 +2,10 @@ package Controllers;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -42,57 +44,72 @@ public class ArtistSubController implements Initializable {
     
     FileSystem file = new FileSystem();
     Main main = new Main();
+    MainController cont = new MainController();
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+			//ArrayList<Song> getSongList = file.loadPlayingList();
+			artist = file.getArtists().get(0);
+			artistName.setText(artist.getTitle());
+			ObservableList<Album> albums = FXCollections.observableArrayList();
+			ObservableList<String> albumTitle = FXCollections.observableArrayList();
+			
+			//if you cant get subscene working. change to file.getAlbums();
+			//Is normally artist.getAlbums()
+			
+			for(Album album: file.getAlbums()) {
+				albums.add(album);
+				albumTitle.add(album.getTitle());
+			}
+			//file.sortSongs(albumTitle);
+			Collections.sort(albumTitle);
+			albumList.setItems(albumTitle);
+			
+			songColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
+	        lengthColumn.setCellValueFactory(new PropertyValueFactory<>("length"));
+			
+	    	albumList.setOnMouseClicked(event -> {
 
-		//ArrayList<Song> getSongList = file.loadPlayingList();
-		artist = file.getArtists().get(0);
-		artistName.setText(artist.getTitle());
-		ObservableList<Album> albums = FXCollections.observableArrayList();
-		ObservableList<String> albumTitle = FXCollections.observableArrayList();
-		//if you cant get subscene working. change to file.getAlbums();
-		
-		for(Album album: artist.getAlbums()) {
-			albums.add(album);
-			albumTitle.add(album.getTitle());
-		}
-		albumList.setItems(albumTitle);
-		
-		songColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
-        lengthColumn.setCellValueFactory(new PropertyValueFactory<>("length"));
-		
-    	albumList.setOnMouseClicked(event -> {
+	            if (event.getClickCount() == 2) {
+	            	for(int i=0; i<albumTitle.size(); i++) {
+	               		if(albumList.getSelectionModel().getSelectedItem().equals(albums.get(i).getTitle())) {
+	               			selectedAlbum=albums.get(i);
+	               		}
+	               	}
+	               try {
+	            	   showSongs(selectedAlbum);
 
-            if (event.getClickCount() == 2) {
-            	for(int i=0; i<albumTitle.size(); i++) {
-               		if(albumList.getSelectionModel().getSelectedItem().equals(albums.get(i).getTitle())) {
-               			selectedAlbum=albums.get(i);
-               		}
-               	}
-               try {
-            	   showSongs(selectedAlbum);
+						
+						
+					} catch (Exception e) {
+						
+					}
+	                
+	                
+	            }
+	   	});
+	    	songTable.setOnMouseClicked( event -> {
+	    		   if( event.getClickCount() == 2 ) {
+	    		      try {
+	    		    	  Platform.runLater(new Runnable() {
 
-					
-					
-				} catch (Exception e) {
-					
-				}
-                
-                
-            }
-   	});
-    	songTable.setOnMouseClicked( event -> {
-    		   if( event.getClickCount() == 2 ) {
-    		      try {
-					main.playMusic(songTable.getSelectionModel().getSelectedItem().getLocation());
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-    		   }});
-		
-		
+							@Override
+							public void run() {
+			    		    	  //System.out.println(songTable.getSelectionModel().getSelectedItem().getTitle());
+			    		    	  //main.addToNext(songTable.getSelectionModel().getSelectedItem().getTitle());
+			    		    	  main.playMusic(songTable.getSelectionModel().getSelectedItem().getLocation());
+							}
+	    		    		  
+	    		    	  });
+
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+	    		   }});
+			
+			
+
 	}
 	
 	public void setSong(Artist artist) {
@@ -104,7 +121,7 @@ public class ArtistSubController implements Initializable {
         songs.addAll(album.getSongs());
         songTable.setItems(songs);
 	}
-    
+
     
 
 }

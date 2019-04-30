@@ -8,7 +8,6 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <HBox prefHeight="100.0" prefWidth="600.0">
@@ -35,7 +34,7 @@
                <children>
                   <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="25.0" layoutY="50.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@../../../../Desktop/Photoshop%20Stuff/Stream%20Stuff/2019%20Logo%20Draft%203.png" />
+                        <Image url="@../../img/2019%20Logo%20Draft%203.png" />
                      </image>
                   </ImageView>
                   <Label layoutX="25.0" layoutY="222.0" prefHeight="93.0" prefWidth="174.0" text="Prem Rana" textAlignment="CENTER">
@@ -47,9 +46,9 @@
             </Pane>
             <Pane prefHeight="322.0" prefWidth="200.0">
                <children>
-                  <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="25.0" layoutY="50.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="5.0" layoutY="50.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@../../../../Desktop/Photoshop%20Stuff/Stream%20Stuff/Indian%20Mamba%20Logo.png" />
+                        <Image url="@../../img/191073-131-0D844C57.jpg" />
                      </image>
                   </ImageView>
                   <Label layoutX="-4.0" layoutY="222.0" prefHeight="93.0" prefWidth="209.0" text="Dominique Forbes">
@@ -63,7 +62,7 @@
                <children>
                   <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="25.0" layoutY="50.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@../../../../Desktop/Photoshop%20Stuff/Stream%20Stuff/2019%20Logo.png" />
+                        <Image url="@../../img/1width300height300appearanceId2version1440399755.jpg" />
                      </image>
                   </ImageView>
                   <Label layoutY="228.0" prefHeight="87.0" prefWidth="200.0" text=" Jacqueline Rigsby" textAlignment="CENTER">

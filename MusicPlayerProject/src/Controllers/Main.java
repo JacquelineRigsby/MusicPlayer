@@ -30,6 +30,7 @@ import javafx.util.Duration;
 import util.Album;
 import util.Artist;
 import util.FileSystem;
+import util.Queue;
 import util.Song;
 
 public class Main extends Application{
@@ -41,12 +42,13 @@ public class Main extends Application{
 	private static Song nowPlaying;
 	private static FileSystem file = new FileSystem();
 	private static ArrayList<Song> getSongList;
-	MainController cont;
+	MainController cont = new MainController();
 	private static MediaPlayer mediaPlayer;
 	private static Song currentsong;
 	private static boolean playing = false;
 	private static Duration duration;
 	private static int timerCounter;
+	//Queue queue = new Queue();
 
 
 
@@ -64,14 +66,15 @@ public class Main extends Application{
         		//Sets Default Directory
         		if(!file.isDefaultDirectory()) {
 					JOptionPane.showMessageDialog(null, "There is no default directory. Please choose one.");
-					String path =file.getDefaultDirectory();
-					file.createLibrary(path);
 				}
+        		String path =file.getDefaultDirectory();
+				file.createLibrary(path);
         		
         		
         		file.getAlbums();
         		file.getArtists();
         		file.getSongs();
+        		
         		
         		getSongList = file.loadPlayingList();
         		
@@ -85,6 +88,8 @@ public class Main extends Application{
         		}
         		nowPlaying = getSongList.get(0);
                 nowPlaying.setPlaying(true);
+                //queue.addToBack(nowPlaying.getTitle());
+                
    
                 
 			} catch (Exception e) {
@@ -118,7 +123,7 @@ public class Main extends Application{
 	
 	public void showMainView() throws Exception {
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("Main.fxml"));
-		cont = new MainController();
+		//cont = new MainController();
 		mainLayout = loader.load();
 		cont.setCurrentScene(mainLayout);
         scene = new Scene((Parent) mainLayout);
@@ -152,8 +157,7 @@ public class Main extends Application{
 		try {
 			Media media = loadMusic(musicLocation);
 			if(!isPlaying()) {
-				//mainController.setNowPlaying(media.toString());
-				cont = new MainController();
+				//cont = new MainController();
 				mediaPlayer = new MediaPlayer(media);
 				mainController = new MainController();
 				if(currentsong != file.getSongLocation(musicLocation)) {
@@ -171,6 +175,14 @@ public class Main extends Application{
 				setNowPlaying(currentsong);
 				currentsong.setPlaying(true);
 				playing = true;
+				mediaPlayer.setOnEndOfMedia(() -> {
+					if(mediaPlayer.getCycleCount() != MediaPlayer.INDEFINITE) {
+						playing = false;
+						mediaPlayer.dispose();
+						//queue.dequeue();
+					}
+			
+				});
 			}
 		} catch (MediaException e) {
 			JOptionPane.showMessageDialog(null, "This song could not be found.");
@@ -234,6 +246,7 @@ public class Main extends Application{
 	public void pauseMusic() {
 		if(isPlaying()) {
 			duration = mediaPlayer.getCurrentTime();
+			currentsong.setPlaying(false);
 			mediaPlayer.pause();
 		}
 	}
@@ -248,17 +261,17 @@ public class Main extends Application{
 	
 	public void repeat(MouseEvent event) {
 		if(event.getClickCount() == 1) {
-			mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
-			System.out.println("we did it reddit");
+			if(mediaPlayer != null) {
+				mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+			}
 		}
 		else if(event.getClickCount() == 2) {
 			mediaPlayer.setCycleCount(0);
-			System.out.println("ZERO TO HERO");
 		}
 		
 	}
-
 	
+
 	
 
 }

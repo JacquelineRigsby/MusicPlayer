@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.sound.sampled.Clip;
 import javax.swing.JOptionPane;
@@ -37,6 +38,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
 import util.*;
@@ -60,20 +62,20 @@ public class MainController implements Initializable{
      @FXML private VBox songs;
      @FXML private TextField searchBar;
      @FXML private HBox subView = new HBox();
-     @FXML private ListView<String> queueList;
+     @FXML private ListView<String> queueList = new ListView();
      @FXML private Pane searchResultView = new Pane();
 
      private static Main main = new Main();
      private static FileSystem file = new FileSystem();
      private static Node currentScene;
      private static boolean showing;
-     private static String test;
+     private static boolean cleared = false;
      private static ArtistSubController artist = new ArtistSubController();
-     private static String searchResult;
+     public static String searchResult;
+     ObservableList<String> songList= FXCollections.observableArrayList();
 
 
      public void initialize(URL location, ResourceBundle resources) {
-    	 
     	 queueList.setVisible(false);
     	 searchResultView.setVisible(false);
     	 homeButton.setVisible(false);
@@ -93,10 +95,18 @@ public class MainController implements Initializable{
              }
          );
          
-         fillQueue();
          //nowPlayingSong.setText(main.getNowPlaying().getTitle());
          
-         
+         queueList.setOnMouseClicked(event -> {
+        	 if( event.getClickCount() == 2 ) {
+    		      try {
+   					main.playMusic(main.getMusic(queueList.getSelectionModel().getSelectedItem()));
+   				} catch (Exception e) {
+   					// TODO Auto-generated catch block
+   					e.printStackTrace();
+   				}
+        	 }
+         });
          
          
          initializeTimeSlider();
@@ -130,7 +140,7 @@ public class MainController implements Initializable{
 
     }
     
-    public void artistsScene(MouseEvent event) throws Exception {
+    public void artistsScene(MouseEvent event) {
     	setView("Artists");
     	
     }
@@ -158,6 +168,7 @@ public class MainController implements Initializable{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
     }
     
     public void pause(MouseEvent event) {
@@ -167,42 +178,24 @@ public class MainController implements Initializable{
     
     public void loop(MouseEvent event) {
     	main.repeat(event);
-    }
-    
-    public void setSubView() {
-    	try {
-    		subView.setVisible(true);
-    		BorderPane pane = new BorderPane();
-			pane = FXMLLoader.load(getClass().getResource("ArtistSub.fxml"));
-			subView.getChildren().setAll(pane);
-			//subView.setVisible(true);
-		} catch (IOException e) {
+    	if(event.getClickCount() == 1) {
+			repeatButton.setOpacity(0.5);
 			
-			e.printStackTrace();
 		}
-		
+		else if(event.getClickCount() == 2) {
+			repeatButton.setOpacity(1);
+		}
     }
     
-    public void setSearchView() {
-    	try {
-    		Node pane;
-    		pane = FXMLLoader.load(getClass().getResource("Search.fxml"));
-    		//SearchController search = new SearchController();
-    		//search.searchBarText("duumu");
-    		homeButton.setVisible(true);
-    		subView.getChildren().setAll(pane);
-    		System.out.println(subView.getChildren());
-    		subView.setVisible(false);
-    		subView.setVisible(true);
-    	} catch (Exception e) {
-    		e.printStackTrace();
-    	}
-    }
     @FXML
     void queueClick(MouseEvent event) {
+    	 if(queueList.getItems().isEmpty() && !cleared){
+         	fillQueue();
+         }
     	queueButton.addEventFilter(MouseEvent.ANY, new EventHandler<MouseEvent>() {
 
             long startTime;
+            
 
             @Override
             public void handle(MouseEvent event) {
@@ -210,12 +203,18 @@ public class MainController implements Initializable{
                 if (event.getEventType().equals(MouseEvent.MOUSE_PRESSED)) {
                     startTime = System.currentTimeMillis();
                 } else if (event.getEventType().equals(MouseEvent.MOUSE_RELEASED) && showing) {
-                    if (System.currentTimeMillis() - startTime > 2 * 1000) {
-                    	System.out.println("Pressed for at least 2 seconds (" + (System.currentTimeMillis() - startTime) + " milliseconds)");
-                        queueList.getItems().removeAll();
+                    if (System.currentTimeMillis() - startTime > 1 * 1000 && System.currentTimeMillis() - startTime < 2 * 1000) {
+                    	//System.out.println(queue.getFront().getTitle());
+                        queueList.getItems().clear();
+                        cleared = true;
                         showing = false;
-                    } else
-                        System.out.println("Pressed for " + (System.currentTimeMillis() - startTime) + " milliseconds");
+                    } else if (System.currentTimeMillis() - startTime > 3 * 1000) {
+                    	//System.out.println("Pressed for " + (System.currentTimeMillis() - startTime) + " milliseconds");
+                    	//updateQueue();
+                    } else {
+                    	//System.out.println("Pressed for " + (System.currentTimeMillis() - startTime) + " milliseconds");
+                    }
+                       
                 }
             }
         });
@@ -240,11 +239,25 @@ public class MainController implements Initializable{
     	//if double click on item in queue, move it to front of queue and play immediatly
     	//if item in queue is held for more than 2-3 seconds, remove it
     	
-    	ObservableList<String> queue= FXCollections.observableArrayList();
+    	;
     	for(Song song: file.getSongs()) {
-    		queue.add(song.getTitle());
+    		songList.add(song.getTitle());
+    		//queue.addToFront(song);
     	}
-    	queueList.setItems(queue);
+    	//System.out.println(queue.getFront().getTitle());
+    	queueList.setItems(songList);
+    }
+    
+    public void updateQueue() {
+    	
+    		//songList.add(queue.Next().getTitle());
+    		//System.out.println(queue.Next().getTitle());
+    
+    	queueList.setItems(songList);
+    }
+    
+    public void addToQueueList(String title) {
+    		
     }
     
     public void setView(String viewName) {    	  
@@ -287,10 +300,6 @@ public class MainController implements Initializable{
 
     }
     
-    public void addToQueue() {
-    	
-    }
-    
     public void sendText(KeyEvent event) {
     	 switch(event.getCode()){
     	 case ENTER:
@@ -299,11 +308,10 @@ public class MainController implements Initializable{
     				 JOptionPane.showMessageDialog(null,"No songs found!");
     			 }
     			 else {
-    				 searchResult=searchBar.getText();
-    				 SearchController controller = new SearchController();
-    				 controller.setSearchResult(searchBar.getText());
-    				 System.out.println(searchResult);
     				 setView("Search");
+    				 searchResult = searchBar.getText();
+    				 
+    				 System.out.println(searchResult);
     				 
     				 //music.playMusic(music.getMusic(searchBar.getText()));
         			 //controller.searchBarText(searchBar.getText());
@@ -325,6 +333,12 @@ public class MainController implements Initializable{
     public void setCurrentScene(Node scene) {
     	this.currentScene=currentScene;
     }
+    
+    public String getsearchResult() {
+    	return searchResult;
+    }
+    
+
     
     
 

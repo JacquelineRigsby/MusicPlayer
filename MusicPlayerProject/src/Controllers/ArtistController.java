@@ -2,6 +2,7 @@ package Controllers;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.ResourceBundle;
 
 import javafx.application.Platform;
@@ -28,17 +29,19 @@ public class ArtistController implements Initializable{
     private Artist selectedArtist;
     
     private FileSystem file = new FileSystem();
+    MainController main = new MainController();
 
     
     public void initialize(URL location, ResourceBundle resources) {
     	//System.out.println("WOOO");
-    	Platform.runLater(() -> {
+    	
     	ObservableList<Artist> artists = FXCollections.observableArrayList();
     	ObservableList<String> artistTitle =FXCollections.observableArrayList();
     	for(Artist artist: file.getArtists()) {
     		artists.add(artist);
     		artistTitle.add(artist.getTitle());
     	}
+    	Collections.sort(artistTitle);
     	artistList.setItems(artistTitle);
     	
     	artistList.setOnMouseClicked(event -> {
@@ -58,28 +61,34 @@ public class ArtistController implements Initializable{
                  }
                  */
                 try {
-					//setview();
-                	MainController main = new MainController();
-					System.out.println("Artist Click");
-					
-		    		Node scene = FXMLLoader.load(getClass().getResource("ArtistSub.fxml"));
-		    		main.setView("ArtistSub");
-		    		 
-		    		 
-		    		 
-					//main.setSubView();
-					
+					setview();
 					
 					
 				} catch (Exception e) {
 					
 				}
                  
-                 
+                 event.consume();
              }
     		});
-    	});
+
     }
+    
+    public void setview() {
+    	Platform.runLater(() -> {
+    		try {
+
+    			
+        		Node scene = FXMLLoader.load(getClass().getResource("ArtistSub.fxml"));
+        		main.setView("ArtistSub");
+
+    		} catch (Exception e) {
+    			
+    		}
+    	});
+    	
+    }
+
     
 
     

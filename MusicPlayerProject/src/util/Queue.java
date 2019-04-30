@@ -1,10 +1,15 @@
 package util;
+
 import java.util.ArrayList;
 import java.util.Random;
 
 import javax.swing.text.html.HTMLDocument.Iterator;
 
-public class Queue<T> implements QueueInterface<T>
+import java.util.Random;
+
+import javax.swing.text.html.HTMLDocument.Iterator;
+
+public class Queue 
 {
 		
 	    Node front, back, current; 
@@ -70,13 +75,14 @@ public class Queue<T> implements QueueInterface<T>
 	        { 
 	           front = back = temp; 
 	           count++;
-	           return; 
 	        } 
 	        else
+	        {
 	        		temp.setPrev(back);
 	       	        back.next = temp; 
 	       	        back = temp; 
 	       	        count++;
+	        }
 	       	        
 	    } 
 	    
@@ -89,16 +95,16 @@ public class Queue<T> implements QueueInterface<T>
 	    	{
 	    		front = back = temp;
 	    		count++;
-	    		return;
 	    	}
 	    	else
-	    			front.setPrev(temp);
+	    	{
 	    			temp2 = front;
 	    			temp2.setPrev(temp);
 	    			front = temp;
 	    			front.setsongID(temp.songID);
 	    			front.setNext(temp2);
 	    			count++;
+	    	}
 	    	
 	    }
 	    
@@ -149,29 +155,36 @@ public class Queue<T> implements QueueInterface<T>
 	    //Dequeueing a specific song
 	    public String dequeue(String songID) 
 	    { 
-	    	Node tempNode = new Node(null);
-	    	String temp = songID; 
-	        tempNode = front;
-	        while(tempNode.songID != songID) {
-	        	tempNode = tempNode.next;
-	        }
-	        if (tempNode.songID == songID)
-	        {
-	        	temp = tempNode.songID;
-	        	tempNode = tempNode.prev;
-	        	tempNode.next = tempNode.next.next;
-	        	addToFront(temp);
-	        	dequeue();
+		    	Node tempNode = new Node(null);
+		    	String temp = songID; 
+		        if (front == null) {
+		           return null; 
+		           }
+		        front = front.next; 
+		        if (front == null) {
+		            back = null; 
+		        	return null; }
+		        tempNode = front;
+		        if (tempNode.songID == temp)
+		        {
+		        	temp = tempNode.songID;
+		        	tempNode = tempNode.prev;
+		        	tempNode.next = tempNode.next.next;
+		        	addToFront(temp);
+		        	dequeue();
+		        }
+		        else if (tempNode.songID != temp) {
+		        	tempNode = tempNode.next;
+		        }
 		        count--;
-	        }
-	        return temp; 
+		        return temp; 
+
 	    } 
 	    
 	    //Uses dequeue and addToFront to add a specific song to the front
 	    public void pushToFront(String songID) {
 	    	Node temp = new Node(null);
 	    	temp.songID = dequeue(songID);
-	    	dequeue(songID);
 	    	addToFront(temp.songID);
 	    }
 	    
@@ -195,9 +208,9 @@ public class Queue<T> implements QueueInterface<T>
 	    }
 	    
 	    //Shuffling the queue
-	    public Queue<String> shuffle(Queue newq) {
+	    public Queue shuffle(Queue newq) {
 	    		Node cycler = front;
-	    		Queue<String> tempq = new Queue<String>();
+	    		Queue tempq = new Queue();
 	    		int count2 = count;
 						tempq.addToFront(cycler.songID);
 	    				newq.dequeue(cycler.songID);
