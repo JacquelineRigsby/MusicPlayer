@@ -57,7 +57,7 @@ public class ArtistSubController implements Initializable {
 			//if you cant get subscene working. change to file.getAlbums();
 			//Is normally artist.getAlbums()
 			
-			for(Album album: file.getAlbums()) {
+			for(Album album: artist.getAlbums()) {
 				albums.add(album);
 				albumTitle.add(album.getTitle());
 			}

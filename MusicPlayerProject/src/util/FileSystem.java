@@ -28,6 +28,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.jaudiotagger.audio.AudioFile;
@@ -124,28 +125,133 @@ public class FileSystem {
 		return found;	
 	}
 	public int getLibrary(File path, Document doc, Element songs, int i) {
-
-
-		File[] files = path.listFiles();
 		
+		ArrayList<String> artistlist = new ArrayList<>();
+		ArrayList<String> albumlist = new ArrayList<>();
+		ArrayList<String> songlist = new ArrayList<>();
+		File[] files = path.listFiles();
+		Element id;
+        Element title;
+        Element song = null;
+        Element artist = null;
+        Element album = null;
+        Element length;
+        Element location;
 		 for (File file : files) {
 			 if (file.isFile()) {
 				try {
+				
+				
 				AudioFile audioFile = AudioFileIO.read(file);
 				
                  Tag tag = audioFile.getTag();
                  AudioHeader header = audioFile.getAudioHeader();
-
-                 Element song = doc.createElement("song");
-                 songs.appendChild(song);
+                 System.out.println(Paths.get(file.getAbsolutePath()).toString());
+                 if(!artistlist.contains(tag.getFirst(FieldKey.ARTIST))) {
+                	 artistlist.add(tag.getFirst(FieldKey.ARTIST));
+                	 
+                	 artist = doc.createElement("artist");
+                	 artist.setTextContent(tag.getFirst(FieldKey.ARTIST));
+                     
+                     songs.appendChild(artist);
+                     if(!albumlist.contains(tag.getFirst(FieldKey.ALBUM))) {
+                    	 albumlist.add(tag.getFirst(FieldKey.ALBUM));
+                    		 
+                    	 album = doc.createElement("album");
+                    	 album.setTextContent(tag.getFirst(FieldKey.ALBUM));
+                    	 
+                    	 artist.appendChild(album);
+                    	 
+                    	 if(!songlist.contains(Paths.get(file.getAbsolutePath()).toString())) {
+                    		 songlist.add(Paths.get(file.getAbsolutePath()).toString());
+                    		 
+                    		 song = doc.createElement("song");
+                    		 album.appendChild(song);
+                    		 
+                    		 id = doc.createElement("id");
+                             title = doc.createElement("title");
+                             length = doc.createElement("length");
+                             location = doc.createElement("location");
+                             
+                             id.setTextContent(Integer.toString(i++));
+                             title.setTextContent(tag.getFirst(FieldKey.TITLE));
+                             length.setTextContent(Integer.toString(header.getTrackLength()));
+                             location.setTextContent(Paths.get(file.getAbsolutePath()).toString());
+                             
+                             song.appendChild(id);
+                             song.appendChild(title);
+                             song.appendChild(length);
+                             song.appendChild(location);
+                    	 }
+                     }
+                     
+                 } 
+                 else if(!albumlist.contains(tag.getFirst(FieldKey.ALBUM)) && artistlist.contains(tag.getFirst(FieldKey.ARTIST))) {
+                	 albumlist.add(tag.getFirst(FieldKey.ALBUM));
+                	 
+                		 
+                	 album = doc.createElement("album");
+                	 album.setTextContent(tag.getFirst(FieldKey.ALBUM));
+                	 
+                	 artist.appendChild(album);
+                	 
+                	 if(!songlist.contains(Paths.get(file.getAbsolutePath()).toString())) {
+                		 songlist.add(Paths.get(file.getAbsolutePath()).toString());
+                		 
+                		 song = doc.createElement("song");
+                		 album.appendChild(song);
+                		 
+                		 id = doc.createElement("id");
+                         title = doc.createElement("title");
+                         length = doc.createElement("length");
+                         location = doc.createElement("location");
+                         
+                         id.setTextContent(Integer.toString(i++));
+                         title.setTextContent(tag.getFirst(FieldKey.TITLE));
+                         length.setTextContent(Integer.toString(header.getTrackLength()));
+                         location.setTextContent(Paths.get(file.getAbsolutePath()).toString());
+                         
+                         song.appendChild(id);
+                         song.appendChild(title);
+                         song.appendChild(length);
+                         song.appendChild(location);
+                	 }
+                 } else if(!songlist.contains(Paths.get(file.getAbsolutePath()).toString()) && albumlist.contains(tag.getFirst(FieldKey.ALBUM))){
+                	 songlist.add(Paths.get(file.getAbsolutePath()).toString());
+            		 
+            		 song = doc.createElement("song");
+            		 album.appendChild(song);
+            		 
+            		 id = doc.createElement("id");
+                     title = doc.createElement("title");
+                     length = doc.createElement("length");
+                     location = doc.createElement("location");
+                     
+                     id.setTextContent(Integer.toString(i++));
+                     title.setTextContent(tag.getFirst(FieldKey.TITLE));
+                     length.setTextContent(Integer.toString(header.getTrackLength()));
+                     location.setTextContent(Paths.get(file.getAbsolutePath()).toString());
+                     
+                     song.appendChild(id);
+                     song.appendChild(title);
+                     song.appendChild(length);
+                     song.appendChild(location);
+                 }
                  
+                 //Element artist = doc.createElement("artist");
+                 //System.out.println(tag.getFirst(FieldKey.ARTIST));
+
+                 //Element song = doc.createElement("song");
+                 //songs.appendChild(artist);
+                 
+                 /*
                  Element id = doc.createElement("id");
                  Element title = doc.createElement("title");
                  Element artist = doc.createElement("artist");
                  Element album = doc.createElement("album");
                  Element length = doc.createElement("length");
                  Element location = doc.createElement("location");
-                 
+                
                  id.setTextContent(Integer.toString(i++));
                  title.setTextContent(tag.getFirst(FieldKey.TITLE));
                  artist.setTextContent(tag.getFirst(FieldKey.ARTIST));
@@ -159,18 +265,20 @@ public class FileSystem {
                  song.appendChild(album);
                  song.appendChild(length);
                  song.appendChild(location);
-                 
+                  */
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 	            } else if(file.isDirectory()) {
 	            	
+	            	
 			 i = getLibrary(file, doc, songs, i);
 		 }
 	          
 		
 	}
+		 
 		 return i;
 }
 	public void createLibrary(String path) throws Exception {
@@ -354,8 +462,7 @@ public class FileSystem {
                 albums.add(new Album(entry.getKey(), artist, albumSongs));
             }
         }
-        for(int i=0; i<albums.size(); i++) {
-        }
+
     }
     public ObservableList<Artist> getArtists() {
         if (artists == null) {

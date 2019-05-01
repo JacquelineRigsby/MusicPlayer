@@ -311,7 +311,6 @@ public class MainController implements Initializable{
     				 setView("Search");
     				 searchResult = searchBar.getText();
     				 
-    				 System.out.println(searchResult);
     				 
     				 //music.playMusic(music.getMusic(searchBar.getText()));
         			 //controller.searchBarText(searchBar.getText());
