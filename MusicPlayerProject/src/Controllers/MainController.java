@@ -67,6 +67,7 @@ public class MainController implements Initializable{
 
      private static Main main = new Main();
      private static FileSystem file = new FileSystem();
+     private static Queue queue = new Queue();
      private static Node currentScene;
      private static boolean showing;
      private static boolean cleared = false;
@@ -100,7 +101,9 @@ public class MainController implements Initializable{
          queueList.setOnMouseClicked(event -> {
         	 if( event.getClickCount() == 2 ) {
     		      try {
+    		    	 
    					main.playMusic(main.getMusic(queueList.getSelectionModel().getSelectedItem()));
+   					
    				} catch (Exception e) {
    					// TODO Auto-generated catch block
    					e.printStackTrace();
@@ -210,7 +213,7 @@ public class MainController implements Initializable{
                         showing = false;
                     } else if (System.currentTimeMillis() - startTime > 3 * 1000) {
                     	//System.out.println("Pressed for " + (System.currentTimeMillis() - startTime) + " milliseconds");
-                    	//updateQueue();
+                    	updateQueue();
                     } else {
                     	//System.out.println("Pressed for " + (System.currentTimeMillis() - startTime) + " milliseconds");
                     }
@@ -242,7 +245,7 @@ public class MainController implements Initializable{
     	;
     	for(Song song: file.getSongs()) {
     		songList.add(song.getTitle());
-    		//queue.addToFront(song);
+    		queue.addToFront(song.getTitle());
     	}
     	//System.out.println(queue.getFront().getTitle());
     	queueList.setItems(songList);
@@ -250,14 +253,14 @@ public class MainController implements Initializable{
     
     public void updateQueue() {
     	
-    		//songList.add(queue.Next().getTitle());
-    		//System.out.println(queue.Next().getTitle());
+    		songList.add(queue.Next());
+    		System.out.println(queue.Next());
     
     	queueList.setItems(songList);
     }
     
     public void addToQueueList(String title) {
-    		
+    		queueList.getItems().add(title);
     }
     
     public void setView(String viewName) {    	  
@@ -267,11 +270,14 @@ public class MainController implements Initializable{
       		  String fileName = viewName.substring(0, 1).toUpperCase() + viewName.substring(1) + ".fxml";
       		  FXMLLoader loader = new FXMLLoader(getClass().getResource(fileName));
       		  currentScene = loader.load();
+      		((ControllerInterface) loader.getController()).setMainController(this);
+      		  
       		  //currentScene.toFront();
       		  //System.out.println(currentScene);  
       		  if(!homeButton.isVisible()) {
       			 homeButton.setVisible(true);
       		  }
+      		  
       		  subView.getChildren().setAll(currentScene);
       		  
   		} catch (IOException e) {
@@ -335,6 +341,10 @@ public class MainController implements Initializable{
     
     public String getsearchResult() {
     	return searchResult;
+    }
+    
+    public HBox getSubView() {
+    	return subView;
     }
     
 

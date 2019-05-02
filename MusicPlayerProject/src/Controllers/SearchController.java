@@ -11,10 +11,11 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import util.ControllerInterface;
 import util.FileSystem;
 import util.Song;
 
-public class SearchController implements Initializable{
+public class SearchController extends ControllerInterface implements Initializable{
 	
 	//get music based on search result
 	//fill that music into an array

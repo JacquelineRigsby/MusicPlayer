@@ -19,10 +19,11 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import util.Album;
 import util.Artist;
+import util.ControllerInterface;
 import util.FileSystem;
 import util.Song;
 
-public class ArtistSubController implements Initializable {
+public class ArtistSubController extends ControllerInterface implements Initializable {
 
     @FXML
     private Label artistName;
@@ -44,7 +45,7 @@ public class ArtistSubController implements Initializable {
     
     FileSystem file = new FileSystem();
     Main main = new Main();
-    MainController cont = new MainController();
+
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -96,8 +97,8 @@ public class ArtistSubController implements Initializable {
 							@Override
 							public void run() {
 			    		    	  //System.out.println(songTable.getSelectionModel().getSelectedItem().getTitle());
-			    		    	  //main.addToNext(songTable.getSelectionModel().getSelectedItem().getTitle());
-			    		    	  main.playMusic(songTable.getSelectionModel().getSelectedItem().getLocation());
+			    		    	  getMainController().addToQueueList(songTable.getSelectionModel().getSelectedItem().getTitle());
+			    		    	  //main.playMusic(songTable.getSelectionModel().getSelectedItem().getLocation());
 							}
 	    		    		  
 	    		    	  });

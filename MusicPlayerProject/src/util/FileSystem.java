@@ -146,7 +146,7 @@ public class FileSystem {
 				
                  Tag tag = audioFile.getTag();
                  AudioHeader header = audioFile.getAudioHeader();
-                 System.out.println(Paths.get(file.getAbsolutePath()).toString());
+                 
                  if(!artistlist.contains(tag.getFirst(FieldKey.ARTIST))) {
                 	 artistlist.add(tag.getFirst(FieldKey.ARTIST));
                 	 

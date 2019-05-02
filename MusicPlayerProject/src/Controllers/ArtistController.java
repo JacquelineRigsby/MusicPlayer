@@ -12,15 +12,20 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import util.Album;
 import util.Artist;
+import util.ControllerInterface;
 import util.FileSystem;
 import util.Song;
 
-public class ArtistController implements Initializable{
+public class ArtistController extends ControllerInterface implements Initializable{
 
     @FXML
     private ListView<String> artistList;
@@ -29,7 +34,6 @@ public class ArtistController implements Initializable{
     private Artist selectedArtist;
     
     private FileSystem file = new FileSystem();
-    MainController main = new MainController();
 
     
     public void initialize(URL location, ResourceBundle resources) {
@@ -65,7 +69,7 @@ public class ArtistController implements Initializable{
 					
 					
 				} catch (Exception e) {
-					
+					e.printStackTrace();
 				}
                  
                  event.consume();
@@ -77,20 +81,16 @@ public class ArtistController implements Initializable{
     public void setview() {
     	Platform.runLater(() -> {
     		try {
-
-    			
-        		Node scene = FXMLLoader.load(getClass().getResource("ArtistSub.fxml"));
-        		main.setView("ArtistSub");
+        		//Node scene = FXMLLoader.load(getClass().getResource("ArtistSub.fxml"));
+        		getMainController().setView("ArtistSub");
 
     		} catch (Exception e) {
-    			
+    			e.printStackTrace();
     		}
     	});
     	
     }
-
     
 
-    
     
 }

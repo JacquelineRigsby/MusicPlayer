@@ -14,11 +14,12 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import util.Album;
+import util.ControllerInterface;
 import util.FileSystem;
 
 import util.Song;
 
-public class AlbumController implements Initializable{
+public class AlbumController extends ControllerInterface implements Initializable{
 
     @FXML
     private ListView<String> albumList;

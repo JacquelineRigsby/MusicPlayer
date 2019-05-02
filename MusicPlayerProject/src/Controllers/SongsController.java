@@ -13,10 +13,11 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import util.ControllerInterface;
 import util.FileSystem;
 import util.Song;
 
-public class SongsController implements Initializable{
+public class SongsController extends ControllerInterface implements Initializable{
 	
 		@FXML
 		private TableView<Song> songsList;
