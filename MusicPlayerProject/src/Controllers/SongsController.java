@@ -1,8 +1,6 @@
 package Controllers;
 
 import java.net.URL;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ResourceBundle;
 
 import javafx.application.Platform;
@@ -36,7 +34,7 @@ public class SongsController extends ControllerInterface implements Initializabl
 	    
 	    FileSystem file = new FileSystem();
 	    Main main = new Main();
-	    private Song selectedSong;
+
 	    
 
 	@Override
@@ -47,9 +45,7 @@ public class SongsController extends ControllerInterface implements Initializabl
 		artistColumn.setCellValueFactory(new PropertyValueFactory<>("artist"));
 		albumColumn.setCellValueFactory(new PropertyValueFactory<>("album"));
 		lengthColumn.setCellValueFactory(new PropertyValueFactory<>("length"));
-		//System.out.println("test");
-		//songList = new 
-		//selectedSong = file.getSong("foward");
+
 		
 		
 		showSongs();
@@ -58,7 +54,7 @@ public class SongsController extends ControllerInterface implements Initializabl
  		   if( event.getClickCount() == 2 ) {
  		      try {
 					main.playMusic(main.getMusic(songsList.getSelectionModel().getSelectedItem().getTitle()));
-					//System.out.println(songsList.getSelectionModel().getSelectedItem().getTitle());
+					 getMainController().addToQueueList(songsList.getSelectionModel().getSelectedItem().getTitle());
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

@@ -3,17 +3,12 @@ package Controllers;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
-import javax.sound.sampled.Clip;
 import javax.swing.JOptionPane;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,21 +19,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
 import util.*;
@@ -62,20 +50,21 @@ public class MainController implements Initializable{
      @FXML private VBox songs;
      @FXML private TextField searchBar;
      @FXML private HBox subView = new HBox();
-     @FXML private ListView<String> queueList = new ListView();
+     @FXML private ListView<String> queueList = new ListView<String>();
      @FXML private Pane searchResultView = new Pane();
 
      private static Main main = new Main();
      private static FileSystem file = new FileSystem();
-     private static Queue queue = new Queue();
+     private static Queue<?> queue = new Queue<>();
      private static Node currentScene;
      private static boolean showing;
      private static boolean cleared = false;
-     private static ArtistSubController artist = new ArtistSubController();
      public static String searchResult;
      ObservableList<String> songList= FXCollections.observableArrayList();
-
-
+     
+     /* This class is used to initialize the GUI. 
+      * It also sets up the listeners for events. 
+      */
      public void initialize(URL location, ResourceBundle resources) {
     	 queueList.setVisible(false);
     	 searchResultView.setVisible(false);
@@ -117,6 +106,11 @@ public class MainController implements Initializable{
 
      }
      
+     /*
+      * This initializes the time slider. I am still unsure why the time slider does not update with the song, but it may have to do with a lack of 
+      * communication between the mediaplayer and the timeslider. This still is important to make the timeslider accessable so that way we can seek 
+      * through a song. 
+      */
      public void initializeTimeSlider() {
 
          Song song = main.getNowPlaying();
@@ -132,31 +126,53 @@ public class MainController implements Initializable{
              timeSlider.setBlockIncrement(1);
          }
      }
-     
+     /*
+      * This would update the timeslider. 
+      */
      public void updateTimeSlider() {
          timeSlider.increment();
      }
      
-     
+     /*
+      * When clicked on the playlist box, it will load the playlist scene. 
+      * We were unable to make the playlist scene(due to time constrants and focusing on making the data structures work)
+      */
      public void playListsScene(MouseEvent event) {
-    	setView("ArtistSub");
+    	//setView("ArtistSub");
+    	 JOptionPane.showMessageDialog(null, "Coming soon");
 
     }
     
+     /*
+      * This will load the Artist.fxml file when it is clicked. 
+      */
     public void artistsScene(MouseEvent event) {
     	setView("Artists");
     	
     }
     
+    /*
+     * This will load the Albums.fxml file when it is clicked. 
+     */
     public void albumScene(MouseEvent event) {
     	setView("Albums");
     }
-    
+    /*
+     * This will load the Songs.fxml file when it is clicked. 
+     */
     public void songsScene(MouseEvent event) {
     	setView("Songs");
     }
     
+    //Method if something isn't added yet. 
+    public void comingSoon(MouseEvent event) {
+    	JOptionPane.showMessageDialog(null, "Coming soon!");
+    }
     
+    /*
+     * When the play button is pressed, it will call the playMusic() method in Main method and play music
+     * This also changes the label when a song is played. 
+     */
     public void play(MouseEvent event) throws Exception {
     	String song = main.getNowPlaying().getTitle();
     	String artist = main.getNowPlaying().getArtist();
@@ -174,11 +190,18 @@ public class MainController implements Initializable{
 
     }
     
+    /*
+     * This calls the pauseMusic() method in main, which pauses the song that is currently played.
+     */
     public void pause(MouseEvent event) {
     	pauseButton.requestFocus();
     	main.pauseMusic();
     }
     
+    /*
+     * This will call the repeat method in main, and loop the current song playing. 
+     * This also will change the opacity of the loop button. 
+     */
     public void loop(MouseEvent event) {
     	main.repeat(event);
     	if(event.getClickCount() == 1) {
@@ -190,8 +213,12 @@ public class MainController implements Initializable{
 		}
     }
     
+    /*
+     * This will open the queue menu and deals with all things queue related. 
+     */
     @FXML
     void queueClick(MouseEvent event) {
+    	//If the queue is empty, this will fill up the queue with a general list of songs. 
     	 if(queueList.getItems().isEmpty() && !cleared){
          	fillQueue();
          }
@@ -205,6 +232,7 @@ public class MainController implements Initializable{
            	
                 if (event.getEventType().equals(MouseEvent.MOUSE_PRESSED)) {
                     startTime = System.currentTimeMillis();
+                    //This clears the queue if the button is pressed for more than 1 second and less than 2 seconds. 
                 } else if (event.getEventType().equals(MouseEvent.MOUSE_RELEASED) && showing) {
                     if (System.currentTimeMillis() - startTime > 1 * 1000 && System.currentTimeMillis() - startTime < 2 * 1000) {
                     	//System.out.println(queue.getFront().getTitle());
@@ -221,7 +249,7 @@ public class MainController implements Initializable{
                 }
             }
         });
-    	
+    	//This makes the queue visible/invisible
     	if(!showing) {
     		queueList.requestFocus();
     		queueList.setVisible(true);
@@ -234,15 +262,9 @@ public class MainController implements Initializable{
     	}
 
     }
-    
+    //This gets a general list if songs and fills the listview with those items. . 
     public void fillQueue() {
-    	//get songs right away
-    	//option to clear songs
-    	//if song is playing, add to queue
-    	//if double click on item in queue, move it to front of queue and play immediatly
-    	//if item in queue is held for more than 2-3 seconds, remove it
-    	
-    	;
+
     	for(Song song: file.getSongs()) {
     		songList.add(song.getTitle());
     		queue.addToFront(song.getTitle());
@@ -258,11 +280,14 @@ public class MainController implements Initializable{
     
     	queueList.setItems(songList);
     }
-    
+    //This adds items to the list view. 
     public void addToQueueList(String title) {
     		queueList.getItems().add(title);
     }
-    
+    /*
+     * This will change the view of the GUI to one of the other fxml files. 
+     * It loads the fxml file, and then loads an instance of that fxml file so data can be passed through the files. 
+     */
     public void setView(String viewName) {    	  
     	Platform.runLater(() -> {
     		try {
@@ -270,6 +295,7 @@ public class MainController implements Initializable{
       		  String fileName = viewName.substring(0, 1).toUpperCase() + viewName.substring(1) + ".fxml";
       		  FXMLLoader loader = new FXMLLoader(getClass().getResource(fileName));
       		  currentScene = loader.load();
+      		  //This loads an instance of the controller. 
       		((ControllerInterface) loader.getController()).setMainController(this);
       		  
       		  //currentScene.toFront();
@@ -280,14 +306,18 @@ public class MainController implements Initializable{
       		  
       		  subView.getChildren().setAll(currentScene);
       		  
+
+      		  
   		} catch (IOException e) {
   			// TODO Auto-generated catch block
   			e.printStackTrace();
   		}
-    	});  
+    	}); 
+    	
+
     }
     
-    
+    //This is used for the go back button. I have to create a whole new scene here since the main fxml file includes the media controls. 
     @FXML
     void goHome(MouseEvent event) {
     		Platform.runLater(() -> {
@@ -305,7 +335,7 @@ public class MainController implements Initializable{
     		});
 
     }
-    
+    //This gets the results from the search bar and sends it to the searchResult method. 
     public void sendText(KeyEvent event) {
     	 switch(event.getCode()){
     	 case ENTER:
@@ -326,26 +356,24 @@ public class MainController implements Initializable{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		default:
+			break;
     		
     	}
     }
     
+    //This changes the label of the song to match with what is currently playing. 
     public void setNowPlaying(String song, String artist) {
     	nowPlayingSong.setText(song);
     	nowPlayingArtist.setText(artist);
     }
     
+    //This sends the currentScene to main method. 
     public void setCurrentScene(Node scene) {
-    	this.currentScene=currentScene;
+    	MainController.currentScene=scene;
     }
     
-    public String getsearchResult() {
-    	return searchResult;
-    }
     
-    public HBox getSubView() {
-    	return subView;
-    }
     
 
     

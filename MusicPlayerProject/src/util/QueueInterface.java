@@ -21,6 +21,6 @@ public String dequeue();
 public String dequeue(String songID);
 public String dequeueFromBack();
 public Node addBehind(String songIDTarget, String songID);
-public Queue shuffle(Queue newq);
+public Queue<T> shuffle(Queue<T> newq);
 
 }

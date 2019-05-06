@@ -1,7 +1,7 @@
 package Controllers;
 
 import java.net.URL;
-import java.util.ArrayList;
+
 import java.util.Collections;
 import java.util.ResourceBundle;
 
@@ -9,9 +9,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
@@ -49,22 +47,20 @@ public class ArtistSubController extends ControllerInterface implements Initiali
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-			//ArrayList<Song> getSongList = file.loadPlayingList();
-			artist = file.getArtists().get(0);
-			artistName.setText(artist.getTitle());
+
+			artist = ArtistController.selectedArtist;
+		 	
 			ObservableList<Album> albums = FXCollections.observableArrayList();
 			ObservableList<String> albumTitle = FXCollections.observableArrayList();
 			
-			//if you cant get subscene working. change to file.getAlbums();
-			//Is normally artist.getAlbums()
 			
 			for(Album album: artist.getAlbums()) {
 				albums.add(album);
 				albumTitle.add(album.getTitle());
 			}
-			//file.sortSongs(albumTitle);
 			Collections.sort(albumTitle);
 			albumList.setItems(albumTitle);
+			artistName.setText(artist.getTitle());
 			
 			songColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
 	        lengthColumn.setCellValueFactory(new PropertyValueFactory<>("length"));
@@ -98,7 +94,7 @@ public class ArtistSubController extends ControllerInterface implements Initiali
 							public void run() {
 			    		    	  //System.out.println(songTable.getSelectionModel().getSelectedItem().getTitle());
 			    		    	  getMainController().addToQueueList(songTable.getSelectionModel().getSelectedItem().getTitle());
-			    		    	  //main.playMusic(songTable.getSelectionModel().getSelectedItem().getLocation());
+			    		    	  main.playMusic(songTable.getSelectionModel().getSelectedItem().getLocation());
 							}
 	    		    		  
 	    		    	  });
@@ -113,14 +109,16 @@ public class ArtistSubController extends ControllerInterface implements Initiali
 
 	}
 	
-	public void setSong(Artist artist) {
-		this.artist = artist;
-	}
 	
 	public void showSongs(Album album) {
 		ObservableList<Song> songs = FXCollections.observableArrayList();
         songs.addAll(album.getSongs());
         songTable.setItems(songs);
+	}
+	
+	public void setArtist(Artist artist) {
+		System.out.println(artist.getTitle());
+		this.artist=artist;
 	}
 
     

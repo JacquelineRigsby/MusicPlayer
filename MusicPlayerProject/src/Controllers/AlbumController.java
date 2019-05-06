@@ -36,7 +36,7 @@ public class AlbumController extends ControllerInterface implements Initializabl
     @FXML
     private TableColumn<Song, Integer> lengthColumn;
     
-    private Album album;
+
     private Album selectedAlbum;
     
     FileSystem file = new FileSystem();
@@ -86,6 +86,7 @@ public class AlbumController extends ControllerInterface implements Initializabl
     		   if( event.getClickCount() == 2 ) {
     		      try {
 					main.playMusic(songTable.getSelectionModel().getSelectedItem().getLocation());
+    		    	getMainController().addToQueueList(songTable.getSelectionModel().getSelectedItem().getTitle());
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

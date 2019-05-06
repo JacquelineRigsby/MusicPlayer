@@ -1,7 +1,6 @@
 package Controllers;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
@@ -36,8 +35,6 @@ public class SearchController extends ControllerInterface implements Initializab
     @FXML
     private TableColumn<Song, Integer> lengthColumn;
     
-    private Song song;
-    private String searchResult;
     
     FileSystem file = new FileSystem();
     Main main = new Main();

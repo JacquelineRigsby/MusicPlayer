@@ -5,12 +5,11 @@ public class DemoQueue {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		 Queue newq=new Queue(); 
+		 Queue<?> newq=new Queue<>(); 
 		 FileSystem file = new FileSystem();
 		 //Queue d = new Queue();
 		 //newq = d;
-		 String six = "Sixth song queued";
-		 String one = "New First";
+
 		 for(Song song: file.getSongs()) {
 			 newq.addToBack(song.getTitle());
 		 }

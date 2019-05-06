@@ -1,27 +1,9 @@
 package util;
 
-import java.awt.Color;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.net.URL;
-import java.net.URLEncoder;
+
+
 import java.util.ArrayList;
 
-import javax.imageio.ImageIO;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamReader;
-
-import org.jaudiotagger.audio.AudioFile;
-import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.tag.Tag;
-import org.jaudiotagger.tag.images.Artwork;
-import org.jaudiotagger.tag.images.ArtworkFactory;
-
-
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.scene.image.Image;
 
 public final class Album{
 
@@ -34,7 +16,7 @@ public final class Album{
 
     /**
      * Constructor for the Album class. 
-     * Creates an album object and obtains the album artwork.
+     * Creates an album object.
      *
 
      * @param title
@@ -56,10 +38,22 @@ public final class Album{
     public String getTitle() {
         return this.title;
     }
+    
+    /**
+     * Gets album artist
+     *
+     * @return album artist
+     */
 
     public String getArtist() {
         return this.artist;
     }
+    
+    /**
+     * Gets album songs
+     *
+     * @return album songs
+     */
 
     public ArrayList<Song> getSongs() {
         return new ArrayList<>(this.songs);

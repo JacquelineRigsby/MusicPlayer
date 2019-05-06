@@ -1,15 +1,10 @@
 package util;
 
-import java.util.ArrayList;
-import java.util.Random;
-
-import javax.swing.text.html.HTMLDocument.Iterator;
 
 import java.util.Random;
 
-import javax.swing.text.html.HTMLDocument.Iterator;
 
-public class Queue 
+public class Queue<T> extends ControllerInterface implements QueueInterface<T>
 {
 		
 	    Node front, back, current; 
@@ -208,9 +203,10 @@ public class Queue
 	    }
 	    
 	    //Shuffling the queue
-	    public Queue shuffle(Queue newq) {
+
+		public Queue<T> shuffle(Queue<T> newq) {
 	    		Node cycler = front;
-	    		Queue tempq = new Queue();
+	    		Queue<T> tempq = new Queue<T>();
 	    		int count2 = count;
 						tempq.addToFront(cycler.songID);
 	    				newq.dequeue(cycler.songID);
